@@ -1,4 +1,4 @@
-# 🗳️ PollSocial - Cross-Platform Social Polling App
+# 🗳️ legitpoll-v2 - Cross-Platform Social Polling App
 
 > **Where social media users debate through polls**
 
