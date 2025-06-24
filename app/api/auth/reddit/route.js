@@ -12,15 +12,11 @@ export async function POST(request) {
     const tokenResponse = await fetch('https://www.reddit.com/api/v1/access_token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${Buffer.from(`${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`).toString('base64')}`,
-        'User-Agent': 'LegitPoll/1.0.0 (by /u/legitpoll)'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'LegitPoll/1.0.0'
       },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: `http://localhost:3000/auth/reddit/callback`
-      })
+      body: `grant_type=authorization_code&code=${code}&redirect_uri=http://localhost:3000/auth/reddit/callback`
     });
 
     if (!tokenResponse.ok) {
@@ -39,7 +35,7 @@ export async function POST(request) {
     const userResponse = await fetch('https://oauth.reddit.com/api/v1/me', {
       headers: {
         'Authorization': `Bearer ${tokenData.access_token}`,
-        'User-Agent': 'LegitPoll/1.0.0 (by /u/legitpoll)'
+        'User-Agent': 'LegitPoll/1.0.0'
       }
     });
 
