@@ -1,0 +1,39 @@
+OAuth Setup Notes - What Actually Worked 🎯
+Twitter OAuth Fix
+
+Issue: Missing HTTPS in callback URL
+Solution: Use https://www.legitpoll.com/api/auth/callback/twitter (not http)
+App Settings: Add BOTH legitpoll.com AND www.legitpoll.com callback URLs
+
+Reddit OAuth Fix
+
+Issue: Old app had corrupted/cached settings
+Solution: CREATE FRESH REDDIT APP with exact settings:
+
+App Type: web app (CRITICAL - not "installed app")
+Redirect URI: https://www.legitpoll.com/api/auth/callback/reddit
+About URL: https://www.legitpoll.com
+
+
+
+NextAuth.js Config
+
+Use NextAuth v4 syntax (not v5/Auth.js)
+Remove custom pages config - use default /api/auth/* routes
+Standard Twitter + Reddit providers work fine
+
+Key Lessons
+
+Fresh OAuth apps fix 90% of weird auth issues
+Exact URL matching is critical (http vs https, www vs non-www)
+Production testing works better than localhost OAuth bullshit
+Official NextAuth examples > random tutorials
+
+Working Environment Variables
+bashNEXTAUTH_URL=https://www.legitpoll.com
+TWITTER_CLIENT_ID=...
+TWITTER_CLIENT_SECRET=...
+REDDIT_CLIENT_ID=...
+REDDIT_CLIENT_SECRET=...
+NEXTAUTH_SECRET=...
+Bottom line: When OAuth breaks, create new apps instead of debugging configs.
