@@ -113,10 +113,10 @@ const handler = NextAuth({
         profileName: profile?.name || profile?.screen_name 
       })
       
-      // Prepare user data for Firestore
+      // Prepare user data for Firestore (filter out undefined values)
       const userData = {
         name: user.name,
-        email: user.email,
+        ...(user.email && { email: user.email }), // Only include email if it exists
         image: user.image,
         platform: account.provider,
         username: account.provider === 'twitter' 
