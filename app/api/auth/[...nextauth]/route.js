@@ -15,14 +15,26 @@ console.log('🔑 NextAuth Secret:', process.env.NEXTAUTH_SECRET ? 'EXISTS' : 'M
 // Initialize Firebase Admin (only once)
 if (!getApps().length) {
   try {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
+    const firebaseConfig = {
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'legitpoll-v2',
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }
+    
+    console.log('🔧 Firebase config check:', {
+      projectId: firebaseConfig.projectId ? 'EXISTS' : 'MISSING',
+      clientEmail: firebaseConfig.clientEmail ? 'EXISTS' : 'MISSING', 
+      privateKey: firebaseConfig.privateKey ? 'EXISTS' : 'MISSING'
     })
-    console.log('🔥 Firebase Admin initialized')
+    
+    if (!firebaseConfig.projectId || !firebaseConfig.clientEmail || !firebaseConfig.privateKey) {
+      throw new Error('Missing Firebase environment variables')
+    }
+    
+    initializeApp({
+      credential: cert(firebaseConfig),
+    })
+    console.log('🔥 Firebase Admin initialized successfully')
   } catch (error) {
     console.error('❌ Firebase Admin init failed:', error)
   }
