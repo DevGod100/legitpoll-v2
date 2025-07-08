@@ -261,7 +261,7 @@ export default function PollDisplay({ pollId }) {
           <CardContent className="pt-6 text-center">
             <h3 className="font-medium mb-2">Share this poll</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Get more Twitter vs Reddit opinions
+              Get more X vs Reddit opinions
             </p>
             <Button
               onClick={() => {
