@@ -1,6 +1,6 @@
 // app/api/polls/create/route.js
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getFbAdminApp } from '@/lib/firebase-admin';
 
@@ -34,12 +34,15 @@ export async function POST(request) {
     const db = getFirestore(fbAdminApp);
     const urlSlug = createUrlSlug(question);
 
+    // Use a fallback for createdBy if email is undefined
+    const createdBy = session.user.email || session.user.name || session.user.id || 'anonymous';
+
     const pollData = {
       question: question.trim(),
       option1: option1.trim(),
       option2: option2.trim(),
       urlSlug,
-      createdBy: session.user.email,
+      createdBy,
       createdAt: new Date(),
       isActive: true,
       
