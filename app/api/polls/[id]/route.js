@@ -5,7 +5,7 @@ import { getFbAdminApp } from '@/lib/firebase-admin';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const fbAdminApp = getFbAdminApp();
     if (!fbAdminApp) {
