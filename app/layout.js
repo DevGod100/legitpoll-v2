@@ -1,8 +1,7 @@
-'use client';
-
+// app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from 'next-auth/react';
+import ClientSessionProvider from '@/components/SessionProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,15 +13,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata = {
+  title: "LegitPoll V2",
+  description: "Where social media users debate through polls",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
+        <ClientSessionProvider>
           {children}
-        </SessionProvider>
+        </ClientSessionProvider>
       </body>
     </html>
   );
