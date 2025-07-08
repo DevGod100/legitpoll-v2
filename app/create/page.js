@@ -1,17 +1,17 @@
 // app/create/page.js
-import CreatePollForm from '@/components/CreatePollForm';
+import PollCreator from '@/components/polls/PollCreator';
 
 export const metadata = {
   title: "Create Poll - LegitPoll",
-  description: "Create a new poll and see what the world thinks",
+  description: "Create a new poll to start a debate between Twitter and Reddit users",
 };
 
-export default function CreatePollPage() {
+export default function CreatePage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container max-w-md mx-auto flex h-14 items-center justify-between px-4">
+      {/* Simple header for create page */}
+      <header className="border-b bg-background/95 backdrop-blur">
+        <div className="container max-w-md mx-auto flex h-14 items-center justify-center px-4">
           <div className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <span className="text-lg">🗳️</span>
@@ -20,10 +20,9 @@ export default function CreatePollPage() {
           </div>
         </div>
       </header>
-
-      {/* Main Content */}
-      <main className="container max-w-md mx-auto py-6 px-4">
-        <CreatePollForm />
+      
+      <main>
+        <PollCreator />
       </main>
     </div>
   );
