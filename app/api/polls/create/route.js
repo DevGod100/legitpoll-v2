@@ -1,7 +1,33 @@
-// app/api/polls/create/route.js - TEST VERSION WITHOUT AUTH
+// app/api/polls/create/route.js - USING WORKING FIREBASE SETUP
 import { NextResponse } from 'next/server';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getFbAdminApp } from '@/lib/firebase-admin';
+import { getServerSession } from 'next-auth/next';
+import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+
+// Copy the exact working function from your NextAuth route
+function getFbAdminApp() {
+  const existingApps = getApps()
+  
+  if (existingApps.length > 0) {
+    return existingApps[0]
+  }
+  
+  try {
+    const serviceAccount = {
+      type: "service_account",
+      project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY,
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    }
+
+    return initializeApp({
+      credential: cert(serviceAccount)
+    })
+  } catch (error) {
+    console.error('❌ Firebase Admin init failed:', error.message)
+    return null
+  }
+}
 
 function createUrlSlug(question) {
   return question
@@ -13,29 +39,26 @@ function createUrlSlug(question) {
 
 export async function POST(request) {
   try {
-    console.log('🚀 Poll creation started - NO AUTH CHECK');
+    const session = await getServerSession();
+    
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { question, option1, option2 } = await request.json();
-    console.log('📝 Poll data:', { question, option1, option2 });
 
     if (!question?.trim() || !option1?.trim() || !option2?.trim()) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
-    console.log('🔥 Initializing Firebase Admin...');
-    const fbAdminApp = getFbAdminApp();
+    const fbAdminApp = getFbAdminApp()
     if (!fbAdminApp) {
-      console.error('❌ Firebase Admin failed to initialize');
-      return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
+      throw new Error('Firebase Admin App not initialized')
     }
-    console.log('✅ Firebase Admin initialized');
-
-    const db = getFirestore(fbAdminApp);
-    const urlSlug = createUrlSlug(question);
-    const createdBy = 'test-user';
     
-    console.log('👤 Created by:', createdBy);
-    console.log('🔗 URL slug:', urlSlug);
+    const db = getFirestore(fbAdminApp)
+    const urlSlug = createUrlSlug(question);
+    const createdBy = session.user.email || session.user.name || session.user.id || 'anonymous';
 
     const pollData = {
       question: question.trim(),
@@ -60,9 +83,7 @@ export async function POST(request) {
       tags: []
     };
 
-    console.log('💾 Saving to Firestore...');
     const docRef = await db.collection('polls').add(pollData);
-    console.log('✅ Poll saved with ID:', docRef.id);
     
     return NextResponse.json({ 
       success: true, 
@@ -72,8 +93,6 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('❌ Error creating poll:', error);
-    console.error('❌ Error details:', error.message);
-    console.error('❌ Error stack:', error.stack);
     return NextResponse.json({ error: 'Failed to create poll: ' + error.message }, { status: 500 });
   }
 }
