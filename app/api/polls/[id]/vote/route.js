@@ -1,6 +1,6 @@
 // app/api/polls/[id]/vote/route.js
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getFbAdminApp } from '@/lib/firebase-admin';
 
@@ -13,7 +13,7 @@ export async function POST(request, { params }) {
     }
 
     const { id: pollId } = params;
-    const { choice } = await request.json(); // 'option1' or 'option2'
+    const { choice } = await request.json();
 
     if (!choice || !['option1', 'option2'].includes(choice)) {
       return NextResponse.json({ error: 'Invalid choice' }, { status: 400 });
@@ -25,7 +25,7 @@ export async function POST(request, { params }) {
     }
 
     const db = getFirestore(fbAdminApp);
-    const userId = session.user.email;
+    const userId = session.user.email || session.user.name || session.user.id;
     const platform = session.user.platform;
 
     // Check if user already voted
@@ -57,7 +57,6 @@ export async function POST(request, { params }) {
 
     const currentVotes = pollDoc.data().votes;
     
-    // Increment the appropriate counters
     const updatedVotes = {
       ...currentVotes,
       [platform]: {

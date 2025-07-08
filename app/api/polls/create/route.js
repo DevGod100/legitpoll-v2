@@ -33,8 +33,6 @@ export async function POST(request) {
 
     const db = getFirestore(fbAdminApp);
     const urlSlug = createUrlSlug(question);
-
-    // Use a fallback for createdBy if email is undefined
     const createdBy = session.user.email || session.user.name || session.user.id || 'anonymous';
 
     const pollData = {
