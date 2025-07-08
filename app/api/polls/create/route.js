@@ -1,6 +1,5 @@
-// app/api/polls/create/route.js
+// app/api/polls/create/route.js - TEST VERSION WITHOUT AUTH
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getFbAdminApp } from '@/lib/firebase-admin';
 
@@ -14,26 +13,29 @@ function createUrlSlug(question) {
 
 export async function POST(request) {
   try {
-    const session = await getServerSession();
-    
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    console.log('🚀 Poll creation started - NO AUTH CHECK');
 
     const { question, option1, option2 } = await request.json();
+    console.log('📝 Poll data:', { question, option1, option2 });
 
     if (!question?.trim() || !option1?.trim() || !option2?.trim()) {
       return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
     }
 
+    console.log('🔥 Initializing Firebase Admin...');
     const fbAdminApp = getFbAdminApp();
     if (!fbAdminApp) {
+      console.error('❌ Firebase Admin failed to initialize');
       return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
     }
+    console.log('✅ Firebase Admin initialized');
 
     const db = getFirestore(fbAdminApp);
     const urlSlug = createUrlSlug(question);
-    const createdBy = session.user.email || session.user.name || session.user.id || 'anonymous';
+    const createdBy = 'test-user';
+    
+    console.log('👤 Created by:', createdBy);
+    console.log('🔗 URL slug:', urlSlug);
 
     const pollData = {
       question: question.trim(),
@@ -58,7 +60,9 @@ export async function POST(request) {
       tags: []
     };
 
+    console.log('💾 Saving to Firestore...');
     const docRef = await db.collection('polls').add(pollData);
+    console.log('✅ Poll saved with ID:', docRef.id);
     
     return NextResponse.json({ 
       success: true, 
@@ -67,7 +71,9 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('Error creating poll:', error);
-    return NextResponse.json({ error: 'Failed to create poll' }, { status: 500 });
+    console.error('❌ Error creating poll:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    return NextResponse.json({ error: 'Failed to create poll: ' + error.message }, { status: 500 });
   }
 }
